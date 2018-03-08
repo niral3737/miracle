@@ -3,8 +3,10 @@ package com.itgo.miracle.users.service;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -43,10 +45,11 @@ public class UserService
       return Response.status(Status.OK).entity(users).build();
    }
 
-   @POST
-   @Path("/remove")
-   public Response remove(long id)
+   @DELETE
+   @Path("/remove/{id}")
+   public Response remove(@PathParam("id") long id)
    {
+      System.out.println(id);
       getDao().delete(id);
 
       return Response.status(Status.OK).build();

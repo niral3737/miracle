@@ -4,6 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -19,6 +20,26 @@ import com.itgo.miracle.utils.HibernateUtil;
 
 public abstract class GenericDaoImpl<T extends BaseObject, F extends BaseFilter> implements GenericDao<T, F>
 {
+
+   private F filterInstance;
+
+   private void createFilterInstanceForLoadAll()
+   {
+      try
+      {
+         filterInstance = getFilterClass().newInstance();
+      }
+      catch (InstantiationException | IllegalAccessException e)
+      {
+         e.printStackTrace();
+      }
+   }
+
+   protected GenericDaoImpl()
+   {
+      createFilterInstanceForLoadAll();
+   }
+
    @Override
    public void store(T obj)
    {
@@ -29,7 +50,14 @@ public abstract class GenericDaoImpl<T extends BaseObject, F extends BaseFilter>
 
          session.beginTransaction();
 
-         session.save(obj);
+         if (obj.isNew())
+         {
+            session.save(obj);
+         }
+         else
+         {
+            session.update(obj);
+         }
 
          session.getTransaction().commit();
       }
@@ -155,21 +183,61 @@ public abstract class GenericDaoImpl<T extends BaseObject, F extends BaseFilter>
    @Override
    public List<T> loadAll()
    {
-      // TODO Auto-generated method stub
-      return null;
+      return loadByFilter(filterInstance);
    }
 
    @Override
    public void delete(long id)
    {
-      // TODO Auto-generated method stub
+      Session session = null;
+      try
+      {
+         session = HibernateUtil.getSessionFactory().openSession();
+         T loaded = session.find(getPersistentClass(), id);
+
+         if (loaded != null)
+         {
+            loaded.setActive(false);
+            store(loaded);
+         }
+      }
+      catch (Exception exc)
+      {
+         throw new DaoException(exc.getMessage());
+      }
+      finally
+      {
+         if (session != null)
+            session.close();
+      }
 
    }
 
    @Override
    public void deleteAll()
    {
-      // TODO Auto-generated method stub
+      Session session = null;
+      Class<T> persistentClass = null;
+      try
+      {
+         session = HibernateUtil.getSessionFactory().openSession();
+         persistentClass = getPersistentClass();
+         Query query = session.createQuery("delete from " + persistentClass.getSimpleName());
+         session.getTransaction().begin();
 
+         query.executeUpdate();
+
+         session.getTransaction().commit();
+      }
+      catch (Throwable e)
+      {
+         e.printStackTrace();
+         throw new DaoException(e.getMessage());
+      }
+      finally
+      {
+         if (session != null)
+            session.close();
+      }
    }
 }
