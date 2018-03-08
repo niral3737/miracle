@@ -10,6 +10,7 @@ public class Invoice extends BaseObject
 {
    private long userId;
    private long customerId;
+   private String title;
    private String invoiceNumber;
    private long firmId;
    private Date invoiceDate;
@@ -119,15 +120,25 @@ public class Invoice extends BaseObject
       this.totalAmount = totalAmount;
    }
 
+   public String getTitle()
+   {
+      return title;
+   }
+
+   public void setTitle(String title)
+   {
+      this.title = title;
+   }
+
    @Override
    public String toString()
    {
       StringBuilder builder = new StringBuilder();
-      builder.append("userId=").append(userId).append(", customerId=").append(customerId).append(", invoiceNumber=")
-            .append(invoiceNumber).append(", firmId=").append(firmId).append(", invoiceDate=").append(invoiceDate)
-            .append(", netAmount=").append(netAmount).append(", discount=").append(discount).append(", sgst=")
-            .append(sgst).append(", cgst=").append(cgst).append(", totalAmount=").append(totalAmount)
-            .append(super.toString());
+      builder.append("userId=").append(userId).append(", customerId=").append(customerId).append(", title=")
+            .append(title).append(", invoiceNumber=").append(invoiceNumber).append(", firmId=").append(firmId)
+            .append(", invoiceDate=").append(invoiceDate).append(", netAmount=").append(netAmount).append(", discount=")
+            .append(discount).append(", sgst=").append(sgst).append(", cgst=").append(cgst).append(", totalAmount=")
+            .append(totalAmount).append(super.toString());
       return builder.toString();
    }
 
