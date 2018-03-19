@@ -22,6 +22,8 @@
 		
 		<mapping class="com.itgo.miracle.billing.entities.Invoice"/>
 		<mapping class="com.itgo.miracle.billing.entities.InvoiceLineItem"/>
+		
+		<mapping class="com.itgo.miracle.billing_configuration.entities.Product"/>
 	</session-factory>
 	
 </hibernate-configuration>

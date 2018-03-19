@@ -20,7 +20,6 @@ import com.itgo.miracle.billing.filters.InvoiceFilter;
 @Path("/invoice")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-
 public class InvoiceService
 {
    private InvoiceDao getDao()

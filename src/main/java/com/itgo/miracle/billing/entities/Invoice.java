@@ -3,9 +3,12 @@ package com.itgo.miracle.billing.entities;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.Entity;
+
 import com.itgo.miracle.global.entities.BaseObject;
 
 @SuppressWarnings("serial")
+@Entity
 public class Invoice extends BaseObject
 {
    private long userId;
@@ -13,7 +16,7 @@ public class Invoice extends BaseObject
    private String title;
    private String invoiceNumber;
    private long firmId;
-   private Date invoiceDate;
+   private Date invoiceDate = new Date();
    private BigDecimal netAmount;
    private BigDecimal discount;
    private BigDecimal sgst;

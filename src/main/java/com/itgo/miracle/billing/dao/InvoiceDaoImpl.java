@@ -1,5 +1,6 @@
 package com.itgo.miracle.billing.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -30,8 +31,12 @@ public class InvoiceDaoImpl extends GenericDaoImpl<Invoice, InvoiceFilter> imple
    protected List<Predicate> getFilterConditions(CriteriaQuery<Invoice> query, Root<Invoice> root,
          CriteriaBuilder builder, InvoiceFilter filter)
    {
-      // TODO Auto-generated method stub
-      return null;
+      List<Predicate> conditions = new ArrayList<>();
+
+      if (filter.userId != 0)
+         conditions.add(builder.equal(root.get("userId"), filter.userId));
+
+      return conditions;
    }
 
 }
