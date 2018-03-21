@@ -16,6 +16,8 @@ import com.itgo.miracle.billing_configuration.dao.DaoFactory;
 import com.itgo.miracle.billing_configuration.dao.ProductDao;
 import com.itgo.miracle.billing_configuration.entities.Product;
 import com.itgo.miracle.billing_configuration.filters.ProductFilter;
+import com.itgo.miracle.global.exceptions.ServerValidation;
+import com.itgo.miracle.global.exceptions.ValidationException;
 
 @Path("/product")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -29,8 +31,10 @@ public class ProductService
 
    @POST
    @Path("/set")
-   public Response set(Product product)
+   public Response set(Product product) throws ValidationException
    {
+      ServerValidation.validate(product);
+
       //validate product
       getDao().store(product);
       return Response.status(Status.OK).entity(product.getId()).build();
