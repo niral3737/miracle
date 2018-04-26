@@ -16,6 +16,7 @@ import com.itgo.miracle.billing_configuration.dao.DaoFactory;
 import com.itgo.miracle.billing_configuration.dao.ProductDao;
 import com.itgo.miracle.billing_configuration.entities.Product;
 import com.itgo.miracle.billing_configuration.filters.ProductFilter;
+import com.itgo.miracle.global.entities.ServiceResponse;
 import com.itgo.miracle.global.exceptions.ServerValidation;
 import com.itgo.miracle.global.exceptions.ValidationException;
 
@@ -37,7 +38,7 @@ public class ProductService
 
       //validate product
       getDao().store(product);
-      return Response.status(Status.OK).entity(product.getId()).build();
+      return Response.status(Status.OK).entity(new ServiceResponse(true, product.getId())).build();
    }
 
    @POST
@@ -46,15 +47,15 @@ public class ProductService
    {
       List<Product> products = getDao().loadByFilter(filter);
 
-      return Response.status(Status.OK).entity(products).build();
+      return Response.status(Status.OK).entity(new ServiceResponse(true, products)).build();
    }
 
    @DELETE
    @Path("/remove/{id}")
-   public Response remove(@PathParam("id") long id)
+   public Response remove(@PathParam("id") long id) throws ValidationException
    {
       getDao().delete(id);
 
-      return Response.status(Status.OK).build();
+      return Response.status(Status.OK).entity(new ServiceResponse(true)).build();
    }
 }

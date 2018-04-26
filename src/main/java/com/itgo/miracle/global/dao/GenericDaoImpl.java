@@ -2,12 +2,14 @@ package com.itgo.miracle.global.dao;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -16,6 +18,8 @@ import org.hibernate.Session;
 import com.itgo.miracle.global.entities.BaseObject;
 import com.itgo.miracle.global.exceptions.DaoException;
 import com.itgo.miracle.global.filters.BaseFilter;
+import com.itgo.miracle.global.filters.BaseFilter.OrderByMode;
+import com.itgo.miracle.global.utils.StringUtils;
 import com.itgo.miracle.utils.HibernateUtil;
 
 public abstract class GenericDaoImpl<T extends BaseObject, F extends BaseFilter> implements GenericDao<T, F>
@@ -107,13 +111,24 @@ public abstract class GenericDaoImpl<T extends BaseObject, F extends BaseFilter>
                addRestrictionsForActiveState(builder, root, conditions);
 
             List<Predicate> filterConditions = getFilterConditions(query, root, builder, filter);
-
             if (filterConditions != null && !filterConditions.isEmpty())
                conditions.addAll(filterConditions);
 
-            query.where(conditions.toArray(new Predicate[] {}));
+            if (!conditions.isEmpty())
+               query.where(conditions.toArray(new Predicate[] {}));
+
+            // ORDER BY ...
+            if (filter.hasOrderByFields())
+            {
+               List<Order> orderByExpressions = getOrderByFields(filter, builder, root);
+               query.orderBy(orderByExpressions);
+            }
 
             TypedQuery<T> typedQuery = session.createQuery(query);
+
+            // LIMIT ...
+            if (filter.limit > 0)
+               typedQuery.setMaxResults(filter.limit);
 
             //EXECUTE
             result = typedQuery.getResultList();
@@ -142,6 +157,26 @@ public abstract class GenericDaoImpl<T extends BaseObject, F extends BaseFilter>
       conditions.add(builder.equal(root.get("active"), 1));
    }
 
+   private List<Order> getOrderByFields(BaseFilter filter, CriteriaBuilder builder, Root<?> path)
+   {
+      ArrayList<Order> orders = new ArrayList<Order>();
+
+      if (filter.hasOrderByFields())
+      {
+         LinkedHashMap<String, OrderByMode> orderByFields = filter.getOrderByFields();
+         for (String field : orderByFields.keySet())
+         {
+            OrderByMode mode = orderByFields.get(field);
+            if (mode == OrderByMode.ASC)
+               orders.add(builder.asc(path.get(field)));
+            else
+               orders.add(builder.desc(path.get(field)));
+         }
+      }
+
+      return orders;
+   }
+
    private T load(long id)
    {
       Session session = null;
@@ -160,6 +195,32 @@ public abstract class GenericDaoImpl<T extends BaseObject, F extends BaseFilter>
       {
          if (session != null)
             session.close();
+      }
+   }
+
+   protected void addFilterRestrictionsForSearchString(Root<T> root, CriteriaBuilder builder, BaseFilter filter,
+         List<Predicate> restrictions)
+   {
+      addFilterRestrictionsForSearchString(root, builder, filter, restrictions, "name");
+   }
+
+   protected void addFilterRestrictionsForSearchString(Root<T> root, CriteriaBuilder builder, BaseFilter filter,
+         List<Predicate> restrictions, String attributeName)
+   {
+      if (StringUtils.isNotNullOrEmpty(filter.searchString))
+         restrictions.add(builder.like(root.<String> get(attributeName), "%" + filter.searchString + "%"));
+   }
+
+   protected void addFilterRestrictionsForSearchString(Root<T> root, CriteriaBuilder builder, BaseFilter filter,
+         List<Predicate> restrictions, List<String> attributeNames)
+   {
+      if (StringUtils.isNotNullOrEmpty(filter.searchString))
+      {
+         Predicate searchStringRestrictions[] = new Predicate[attributeNames.size()];
+         for (int i = 0; i < attributeNames.size(); i++)
+            searchStringRestrictions[i] = builder.like(root.<String> get(attributeNames.get(i)),
+                  "%" + filter.searchString + "%");
+         restrictions.add(builder.or(searchStringRestrictions));
       }
    }
 

@@ -4,5 +4,6 @@ import com.itgo.miracle.global.filters.BaseFilter;
 
 public class ProductFilter extends BaseFilter
 {
-
+   public long userId;
+   public Long pagingOffsetProductId;
 }

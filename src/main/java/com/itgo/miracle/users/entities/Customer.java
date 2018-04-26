@@ -12,6 +12,7 @@ public class Customer extends BaseObject
    private String phoneNumber;
    private String firmName;
    private long addressId;
+   private long userId;
 
    public String getName()
    {
@@ -53,12 +54,23 @@ public class Customer extends BaseObject
       this.addressId = addressId;
    }
 
+   public long getUserId()
+   {
+      return userId;
+   }
+
+   public void setUserId(long userId)
+   {
+      this.userId = userId;
+   }
+
    @Override
    public String toString()
    {
       StringBuilder builder = new StringBuilder();
       builder.append("name=").append(name).append(", phoneNumber=").append(phoneNumber).append(", firmName=")
-            .append(firmName).append(", addressId=").append(addressId).append(super.toString());
+            .append(firmName).append(", addressId=").append(addressId).append(", userId=").append(userId)
+            .append(super.toString());
       return builder.toString();
    }
 
