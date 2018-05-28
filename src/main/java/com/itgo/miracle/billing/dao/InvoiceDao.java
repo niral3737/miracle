@@ -6,5 +6,5 @@ import com.itgo.miracle.global.dao.GenericDao;
 
 public interface InvoiceDao extends GenericDao<Invoice, InvoiceFilter>
 {
-
+   //
 }
