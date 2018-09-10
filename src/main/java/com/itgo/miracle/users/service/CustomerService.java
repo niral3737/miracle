@@ -12,6 +12,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.itgo.miracle.global.entities.ServiceResponse;
+import com.itgo.miracle.global.exceptions.ServerValidation;
+import com.itgo.miracle.global.exceptions.ValidationException;
 import com.itgo.miracle.users.dao.CustomerDao;
 import com.itgo.miracle.users.dao.DaoFactory;
 import com.itgo.miracle.users.entities.Customer;
@@ -29,29 +32,29 @@ public class CustomerService
 
    @POST
    @Path("/set")
-   public Response set(Customer customer)
+   public Response set(Customer customer) throws ValidationException
    {
+      ServerValidation.validate(customer);
       //validate user
       getDao().store(customer);
-      return Response.status(Status.OK).entity(customer.getId()).build();
+      return Response.status(Status.OK).entity(new ServiceResponse(true, customer.getId())).build();
    }
 
    @POST
    @Path("/get")
    public Response get(CustomerFilter filter)
    {
-      List<Customer> cutomers = getDao().loadByFilter(filter);
+      List<Customer> customers = getDao().loadByFilter(filter);
 
-      return Response.status(Status.OK).entity(cutomers).build();
+      return Response.status(Status.OK).entity(new ServiceResponse(true, customers)).build();
    }
 
    @DELETE
    @Path("/remove/{id}")
    public Response remove(@PathParam("id") long id)
    {
-      System.out.println(id);
       getDao().delete(id);
 
-      return Response.status(Status.OK).build();
+      return Response.status(Status.OK).entity(new ServiceResponse(true)).build();
    }
 }

@@ -10,8 +10,7 @@ public class Customer extends BaseObject
 {
    private String name;
    private String phoneNumber;
-   private String firmName;
-   private long addressId;
+   private String address;
    private long userId;
 
    public String getName()
@@ -34,26 +33,6 @@ public class Customer extends BaseObject
       this.phoneNumber = phoneNumber;
    }
 
-   public String getFirmName()
-   {
-      return firmName;
-   }
-
-   public void setFirmName(String firmName)
-   {
-      this.firmName = firmName;
-   }
-
-   public long getAddressId()
-   {
-      return addressId;
-   }
-
-   public void setAddressId(long addressId)
-   {
-      this.addressId = addressId;
-   }
-
    public long getUserId()
    {
       return userId;
@@ -64,13 +43,22 @@ public class Customer extends BaseObject
       this.userId = userId;
    }
 
+   public String getAddress()
+   {
+      return address;
+   }
+
+   public void setAddress(String address)
+   {
+      this.address = address;
+   }
+
    @Override
    public String toString()
    {
       StringBuilder builder = new StringBuilder();
-      builder.append("name=").append(name).append(", phoneNumber=").append(phoneNumber).append(", firmName=")
-            .append(firmName).append(", addressId=").append(addressId).append(", userId=").append(userId)
-            .append(super.toString());
+      builder.append("Customer [name=").append(name).append(", phoneNumber=").append(phoneNumber).append(", address=")
+            .append(address).append(", userId=").append(userId).append(super.toString());
       return builder.toString();
    }
 

@@ -1,5 +1,7 @@
 package com.itgo.miracle.users.dao;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -8,6 +10,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import com.itgo.miracle.global.dao.GenericDaoImpl;
+import com.itgo.miracle.global.filters.BaseFilter.OrderByMode;
 import com.itgo.miracle.users.entities.Customer;
 import com.itgo.miracle.users.filters.CustomerFilter;
 
@@ -30,8 +33,20 @@ public class CustomerDaoImpl extends GenericDaoImpl<Customer, CustomerFilter> im
    protected List<Predicate> getFilterConditions(CriteriaQuery<Customer> query, Root<Customer> root,
          CriteriaBuilder builder, CustomerFilter filter)
    {
-      // TODO Auto-generated method stub
-      return null;
+      List<Predicate> restrictions = new ArrayList<Predicate>();
+
+      if (filter.userId != 0)
+         restrictions.add(builder.equal(root.<Long> get("userId"), filter.userId));
+
+      if (filter.pagingOffsetCustomerId != null)
+      {
+         if (filter.pagingOffsetCustomerId != 0)
+            restrictions.add(builder.lt(root.<Long> get("id"), filter.pagingOffsetCustomerId));
+         filter.addOrderBy("id", OrderByMode.DESC);
+      }
+
+      addFilterRestrictionsForSearchString(root, builder, filter, restrictions, Arrays.asList("name", "address"));
+      return restrictions;
    }
 
 }
